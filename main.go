@@ -38,7 +38,8 @@ func main() {
 	yo1 := myrdata.YO{Priority: 10, Yo: "yo!"}
 	roundtrip(mytype.MyTypeYO, yo1)
 
-	sr1 := myrdata.CLOUDFLARESINGLEREDIRECT{Code: 301, Description: "Moved Permanently", When: "^http://example.com/(.*)$", Then: "https://example.com/$1"}
+	//sr1 := myrdata.CLOUDFLARESINGLEREDIRECT{Code: 301, Description: "Moved Permanently", When: "^http://example.com/(.*)$", Then: "https://example.com/$1"}
+	sr1 := myrdata.CLOUDFLARESINGLEREDIRECT{Code: 301, Description: "simple", When: "when", Then: "then"}
 	roundtrip(mytype.MyTypeCLOUDFLARESINGLEREDIRECT, sr1)
 
 	// TODO(tlim): Test that ZoneParser works with custom types.
@@ -73,5 +74,8 @@ func roundtrip(typ uint16, r dns.RDATA) {
 func parserdata(typ uint16, s string) (dns.RDATA, error) {
 	// Isn't there a better way?
 	rr, err := dns.New(fmt.Sprintf(". 0 IN %s %s", dns.TypeToString[typ], s))
+	if err != nil {
+		fmt.Printf("DEBUG: dns.New failed: %v\n", err)
+	}
 	return rr.Data(), err
 }

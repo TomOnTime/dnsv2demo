@@ -3,6 +3,7 @@ package mytype
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"codeberg.org/miekg/dns"
 	"codeberg.org/miekg/dns/dnsutil"
@@ -35,14 +36,28 @@ func (rr *CLOUDFLARESINGLEREDIRECT) String() string {
 
 // Parser interface.
 func (rr *CLOUDFLARESINGLEREDIRECT) Parse(tokens []string, _ string) error {
+	for i, t := range tokens {
+		fmt.Printf("DEBUG: CLOUDFLARESINGLEREDIRECT.Token[%d]: %q\n", i, t)
+	}
 	if len(tokens) < 4 { // no rdata
 		return nil
 	}
-	c, err := strconv.ParseUint(tokens[0], 10, 16)
-	if err != nil || c > 999 {
+
+	desc := strings.TrimSpace(tokens[0])
+	code, err := strconv.ParseUint(tokens[1], 10, 16)
+	if err != nil || code > 999 {
 		return fmt.Errorf("bad CLOUDFLARESINGLEREDIRECT Code")
 	}
+	when := strings.TrimSpace(tokens[2])
+	then := strings.TrimSpace(tokens[3])
 
-	rr.SingleRedirect = myrdata.CLOUDFLARESINGLEREDIRECT{Code: uint16(c), Description: tokens[1], When: tokens[2], Then: tokens[3]}
+	fmt.Printf("DEBUG: CLOUDFLARESINGLEREDIRECT.Fields: %q %03d %q %q\n", desc, code, when, then)
+
+	rr.SingleRedirect = myrdata.CLOUDFLARESINGLEREDIRECT{
+		Description: desc,
+		Code:        uint16(code),
+		When:        when,
+		Then:        then,
+	}
 	return nil
 }
