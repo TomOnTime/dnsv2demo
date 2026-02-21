@@ -3,7 +3,6 @@ package mytype
 import (
 	"fmt"
 	"strconv"
-	"strings"
 
 	"codeberg.org/miekg/dns"
 	"codeberg.org/miekg/dns/dnsutil"
@@ -37,22 +36,24 @@ func (rr *CLOUDFLARESINGLEREDIRECT) String() string {
 // Parser interface.
 // TODO(tlim): Implement unescaping of description, when, then fields.
 func (rr *CLOUDFLARESINGLEREDIRECT) Parse(tokens []string, _ string) error {
-	for i, t := range tokens {
-		fmt.Printf("DEBUG: CLOUDFLARESINGLEREDIRECT.Token[%d]: %q\n", i, t)
-	}
-	if len(tokens) < 4 { // no rdata
+	fields := myrdata.TokensToFields(tokens)
+	// for i, t := range tokens {
+	// 	fmt.Printf("DEBUG: CLOUDFLARESINGLEREDIRECT.Token[%d]: %q\n", i, t)
+	// }
+
+	if len(fields) < 4 { // no rdata
 		return nil
 	}
 
-	desc := strings.TrimSpace(tokens[0])
-	code, err := strconv.ParseUint(tokens[1], 10, 16)
+	desc := fields[0]
+	code, err := strconv.ParseUint(fields[1], 10, 16)
 	if err != nil || code > 999 {
 		return fmt.Errorf("bad CLOUDFLARESINGLEREDIRECT Code")
 	}
-	when := strings.TrimSpace(tokens[2])
-	then := strings.TrimSpace(tokens[3])
+	when := fields[2]
+	then := fields[3]
 
-	fmt.Printf("DEBUG: CLOUDFLARESINGLEREDIRECT.Fields: %q %03d %q %q\n", desc, code, when, then)
+	//fmt.Printf("CLOUDFLARESINGLEREDIRECT.Fields: %q %03d %q %q\n", desc, code, when, then)
 
 	rr.SingleRedirect = myrdata.CLOUDFLARESINGLEREDIRECT{
 		Description: desc,

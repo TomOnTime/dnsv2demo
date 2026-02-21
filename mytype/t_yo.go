@@ -32,17 +32,20 @@ func (rr *YO) String() string {
 
 // Parser interface.
 func (rr *YO) Parse(tokens []string, _ string) error {
-	for i, t := range tokens {
-		fmt.Printf("DEBUG: YO.Token[%d]: %q\n", i, t)
-	}
-	if len(tokens) < 2 { // no rdata
+	fields := myrdata.TokensToFields(tokens)
+	// for i, t := range fields {
+	// 	fmt.Printf("DEBUG: YO.Fields[%d]: %q\n", i, t)
+	// }
+
+	if len(fields) < 2 { // no rdata
 		return nil
 	}
-	i, err := strconv.ParseUint(tokens[0], 10, 32)
+
+	i, err := strconv.ParseUint(fields[0], 10, 32)
 	if err != nil || i > 255 {
 		return fmt.Errorf("bad YO Priority")
 	}
 
-	rr.Yo = myrdata.YO{Priority: uint8(i), Yo: tokens[1]}
+	rr.Yo = myrdata.YO{Priority: uint8(i), Yo: fields[1]}
 	return nil
 }

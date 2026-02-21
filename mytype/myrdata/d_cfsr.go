@@ -9,9 +9,10 @@ type CLOUDFLARESINGLEREDIRECT struct {
 	Then        string `dns:"string"` // replacement regex
 }
 
+// String returns the string representation of the CLOUDFLARESINGLEREDIRECT RDATA.
+// TODO(tlim): Escape the strings.  "%q" is not what a zonefile expects.
 func (rr CLOUDFLARESINGLEREDIRECT) String() string {
-	// TODO(tlim): Escape the strings.
-	return fmt.Sprintf(`%s %03d %s %s`, rr.Description, rr.Code, rr.When, rr.Then)
+	return fmt.Sprintf(`%q %03d %q %q`, rr.Description, rr.Code, rr.When, rr.Then)
 }
 
 func (rr CLOUDFLARESINGLEREDIRECT) Len() int {
