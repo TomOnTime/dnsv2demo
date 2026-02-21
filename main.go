@@ -32,22 +32,25 @@ import (
 func main() {
 
 	mx1 := rdata.MX{Preference: 10, Mx: "mx.plts.org."}
-	roundtrip(dns.TypeMX, mx1)
+	roundtrip(dns.TypeMX, mx1, parserdataBuiltin)
 
 	mytype.Register()
 
 	yo1 := myrdata.YO{Priority: 10, Yo: "yo!"}
-	roundtrip(mytype.MyTypeYO, yo1)
+	roundtrip(mytype.MyTypeYO, yo1, parserdataExternal)
 
 	//sr1 := myrdata.CLOUDFLARESINGLEREDIRECT{Code: 301, Description: "Moved Permanently", When: "^http://example.com/(.*)$", Then: "https://example.com/$1"}
 	sr1 := myrdata.CLOUDFLARESINGLEREDIRECT{Code: 301, Description: "simple", When: "when", Then: "then"}
-	roundtrip(mytype.MyTypeCLOUDFLARESINGLEREDIRECT, sr1)
+	roundtrip(mytype.MyTypeCLOUDFLARESINGLEREDIRECT, sr1, parserdataExternal)
+
+	sr2 := myrdata.CLOUDFLARESINGLEREDIRECT{Code: 301, Description: "Moved Permanently", When: "^http://example.com/(.*)$", Then: "https://example.com/$1"}
+	roundtrip(mytype.MyTypeCLOUDFLARESINGLEREDIRECT, sr2, parserdataExternal)
 
 	// TODO(tlim): Test that ZoneParser works with custom types.
 
 }
 
-func roundtrip(typ uint16, r dns.RDATA) {
+func roundtrip(typ uint16, r dns.RDATA, parseFn func(uint16, string) (dns.RDATA, error)) {
 	defer fmt.Println() // Always print a blank line after the output.
 
 	// Step 1: String() the RDATA
@@ -61,7 +64,7 @@ func roundtrip(typ uint16, r dns.RDATA) {
 	println("String:", s1)
 
 	// Step 2:
-	r2, err := parserdata(typ, s1)
+	r2, err := parseFn(typ, s1)
 	if err != nil {
 		fmt.Printf("Step 2: Error parsing %v %q: %s\n", typStr, s1, err.Error())
 		return
@@ -75,15 +78,17 @@ func roundtrip(typ uint16, r dns.RDATA) {
 	}
 }
 
-// parserdata parses an RDATA string based on the type and returns the corresponding RDATA object.
-func parserdata(typ uint16, s string) (dns.RDATA, error) {
+// parserdataBuiltin parses an RDATA string based on the type and returns the corresponding RDATA object.
+func parserdataBuiltin(typ uint16, s string) (dns.RDATA, error) {
 	return dns.NewData(typ, s)
-	// // Isn't there a better way?
-	// rr, err := dns.New(fmt.Sprintf(". 0 IN %s %s", dns.TypeToString[typ], s))
-	//
-	//	if err != nil {
-	//		fmt.Printf("DEBUG: dns.New failed: %v\n", err)
-	//	}
-	//
-	// return rr.Data(), err
+}
+
+// parserdataExternal uses ZoneParser().
+func parserdataExternal(typ uint16, s string) (dns.RDATA, error) {
+	rr, err := dns.New(fmt.Sprintf(". 0 IN %s %s", dns.TypeToString[typ], s))
+	if err != nil {
+		fmt.Printf("DEBUG: dns.New failed: %v\n", err)
+	}
+
+	return rr.Data(), err
 }
