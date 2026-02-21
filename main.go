@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"codeberg.org/miekg/dns"
+	"codeberg.org/miekg/dns/dnsutil"
 	"codeberg.org/miekg/dns/rdata"
 	"github.com/TomOnTime/dnsv2demo/mytype"
 	"github.com/TomOnTime/dnsv2demo/mytype/myrdata"
@@ -47,9 +48,13 @@ func main() {
 }
 
 func roundtrip(typ uint16, r dns.RDATA) {
+	defer fmt.Println() // Always print a blank line after the output.
+
 	// Step 1: String() the RDATA
 	// Step 2: parserdata() the string back to an RDATA
 	// Step 3: String() the new RDATA and compare to the original string
+
+	typStr := dnsutil.TypeToString(typ)
 
 	// Step 1:
 	s1 := r.String()
@@ -58,7 +63,7 @@ func roundtrip(typ uint16, r dns.RDATA) {
 	// Step 2:
 	r2, err := parserdata(typ, s1)
 	if err != nil {
-		println("Error parsing:", err.Error())
+		fmt.Printf("Step 2: Error parsing %v %q: %s\n", typStr, s1, err.Error())
 		return
 	}
 
@@ -66,16 +71,19 @@ func roundtrip(typ uint16, r dns.RDATA) {
 	s3 := r2.String()
 	println("Round-trip String:", s3)
 	if s1 != s3 {
-		println("Round-trip mismatch!")
+		fmt.Println("Step 3: Round-trip mismatch!")
 	}
 }
 
 // parserdata parses an RDATA string based on the type and returns the corresponding RDATA object.
 func parserdata(typ uint16, s string) (dns.RDATA, error) {
-	// Isn't there a better way?
-	rr, err := dns.New(fmt.Sprintf(". 0 IN %s %s", dns.TypeToString[typ], s))
-	if err != nil {
-		fmt.Printf("DEBUG: dns.New failed: %v\n", err)
-	}
-	return rr.Data(), err
+	return dns.NewData(typ, s)
+	// // Isn't there a better way?
+	// rr, err := dns.New(fmt.Sprintf(". 0 IN %s %s", dns.TypeToString[typ], s))
+	//
+	//	if err != nil {
+	//		fmt.Printf("DEBUG: dns.New failed: %v\n", err)
+	//	}
+	//
+	// return rr.Data(), err
 }

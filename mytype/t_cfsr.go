@@ -35,6 +35,7 @@ func (rr *CLOUDFLARESINGLEREDIRECT) String() string {
 }
 
 // Parser interface.
+// TODO(tlim): Implement unescaping of description, when, then fields.
 func (rr *CLOUDFLARESINGLEREDIRECT) Parse(tokens []string, _ string) error {
 	for i, t := range tokens {
 		fmt.Printf("DEBUG: CLOUDFLARESINGLEREDIRECT.Token[%d]: %q\n", i, t)

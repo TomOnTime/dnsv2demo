@@ -32,6 +32,9 @@ func (rr *YO) String() string {
 
 // Parser interface.
 func (rr *YO) Parse(tokens []string, _ string) error {
+	for i, t := range tokens {
+		fmt.Printf("DEBUG: YO.Token[%d]: %q\n", i, t)
+	}
 	if len(tokens) < 2 { // no rdata
 		return nil
 	}
