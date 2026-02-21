@@ -45,7 +45,7 @@ func main() {
 	sr2 := myrdata.CLOUDFLARESINGLEREDIRECT{Code: 301, Description: "Moved Permanently", When: "^http://example.com/(.*)$", Then: "https://example.com/$1"}
 	roundtrip(mytype.MyTypeCLOUDFLARESINGLEREDIRECT, sr2, parserdataExternal)
 
-	sr3 := myrdata.CLOUDFLARESINGLEREDIRECT{Code: 301, Description: "Moved \" Permanently", When: "^http://example.com/(.*)$", Then: "https://example.com/$1"}
+	sr3 := myrdata.CLOUDFLARESINGLEREDIRECT{Code: 301, Description: "dquote \" pound # at @ semi ; dot . sq ' per % ff \x0c bs \\ happy ☻", When: "^http://example.com/(.*)$", Then: "https://example.com/$1"}
 	roundtrip(mytype.MyTypeCLOUDFLARESINGLEREDIRECT, sr3, parserdataExternal)
 
 	// TODO(tlim): Test that ZoneParser works with custom types.
@@ -63,7 +63,7 @@ func roundtrip(typ uint16, r dns.RDATA, parseFn func(uint16, string) (dns.RDATA,
 
 	// Step 1:
 	s1 := r.String()
-	println("String:", s1)
+	println("Original   String:", s1)
 
 	// Step 2:
 	r2, err := parseFn(typ, s1)
@@ -89,7 +89,7 @@ func parserdataBuiltin(typ uint16, s string) (dns.RDATA, error) {
 func parserdataExternal(typ uint16, s string) (dns.RDATA, error) {
 	rr, err := dns.New(fmt.Sprintf(". 0 IN %s %s", dns.TypeToString[typ], s))
 	if err != nil {
-		fmt.Printf("DEBUG: dns.New failed: %v\n", err)
+		return nil, fmt.Errorf("ERROR: dns.New failed: %v", err)
 	}
 
 	return rr.Data(), err

@@ -1,6 +1,9 @@
 package myrdata
 
-import "strings"
+import (
+	"strconv"
+	"strings"
+)
 
 // TokensToFields transforms a slice of tokens into fields, combining quoted strings.
 // TODO(tlim): There may be other tokens we need to be handle. It's probably better
@@ -39,4 +42,27 @@ func TokensToFields(tokens []string) []string {
 		fields[i] = strings.ReplaceAll(f, `\"`, `"`)
 	}
 	return fields
+}
+
+func ZoneEscapeString(s string) string {
+	orig := s
+	// Escape backslash first
+	s = strings.ReplaceAll(s, `\`, `\\`)
+	// Escape double quotes
+	s = strings.ReplaceAll(s, `"`, `\"`)
+	// Escape control characters
+	var escaped strings.Builder
+	for _, r := range s {
+		if r < 32 || r == 127 {
+			escaped.WriteString(`\` + strconv.FormatInt(int64(r), 10))
+		} else {
+			escaped.WriteRune(r)
+		}
+	}
+	s = escaped.String()
+
+	if s == orig {
+		return orig
+	}
+	return `"` + s + `"`
 }

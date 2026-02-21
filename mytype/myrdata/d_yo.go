@@ -10,9 +10,12 @@ type YO struct {
 // String returns the string representation of the YO RDATA.
 // TODO(tlim): Escape the Yo string.
 func (rr YO) String() string {
-	return strconv.FormatUint(uint64(rr.Priority), 10) + " " + rr.Yo
+	return strconv.FormatUint(uint64(rr.Priority), 10) +
+		" " +
+		ZoneEscapeString(rr.Yo)
 }
 
 func (rr YO) Len() int {
-	return 1 + len(rr.Yo)
+	return len(rr.String())
+	//return 1 + len(rr.Yo)
 }

@@ -37,9 +37,9 @@ func (rr *CLOUDFLARESINGLEREDIRECT) String() string {
 // TODO(tlim): Implement unescaping of description, when, then fields.
 func (rr *CLOUDFLARESINGLEREDIRECT) Parse(tokens []string, _ string) error {
 	fields := myrdata.TokensToFields(tokens)
-	// for i, t := range tokens {
-	// 	fmt.Printf("DEBUG: CLOUDFLARESINGLEREDIRECT.Token[%d]: %q\n", i, t)
-	// }
+	for i, t := range tokens {
+		fmt.Printf("DEBUG: CLOUDFLARESINGLEREDIRECT.Token[%d]: %q\n", i, t)
+	}
 
 	if len(fields) < 4 { // no rdata
 		return nil
