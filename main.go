@@ -34,6 +34,9 @@ func main() {
 	mx1 := rdata.MX{Preference: 10, Mx: "mx.plts.org."}
 	roundtrip(dns.TypeMX, mx1, parserdataBuiltin)
 
+	txt1 := rdata.TXT{Txt: []string{"yo!", "dquote \" pound # at @ semi ; dot . sq ' per % ff \x0c z \x00 bs \\ happy ☻"}}
+	roundtrip(dns.TypeTXT, txt1, parserdataBuiltin)
+
 	mytype.Register()
 
 	yo1 := myrdata.YO{Priority: 10, Yo: "yo!"}
